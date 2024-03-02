@@ -3,10 +3,66 @@ const cors=require("cors");
 const {User,Question,db}=require("./config.js");
 const {doc,getDoc}=require("firebase/firestore");
 const app=express();
+// const cors = require('cors')
 
+app.use(cors({origin: '*'}))
 app.use(express.json());
-app.use(cors());
-
+// app.use(cors());
+const query = `
+  query getUserProfile($username: String!) {
+    allQuestionsCount {
+      difficulty
+      count
+    }
+    matchedUser(username: $username) {
+      contributions {
+        points
+      }
+      profile {
+        reputation
+        ranking
+      }
+      submissionCalendar
+      submitStats {
+        acSubmissionNum {
+          difficulty
+          count
+          submissions
+        }
+        totalSubmissionNum {
+          difficulty
+          count
+          submissions
+        }
+      }
+    }
+    recentSubmissionList(username: $username) {
+      title
+      titleSlug
+      timestamp
+      statusDisplay
+      lang
+      __typename
+    }
+    matchedUserStats: matchedUser(username: $username) {
+      submitStats: submitStatsGlobal {
+        acSubmissionNum {
+          difficulty
+          count
+          submissions
+          __typename
+        }
+        totalSubmissionNum {
+          difficulty
+          count
+          submissions
+          __typename
+        }
+        __typename
+      }
+    }
+  }
+`;
 const fetchData=async()=>{
     const snapshot=await User.get();
     // console.log(snapshot.docs);
@@ -55,6 +111,20 @@ app.post("/create",async(req,res)=>{
         res.json({users:updatedList});
     }
     // res.send({msg:"User added"});
+})
+app.post("/fetchUserProfile",async(req,res)=>{
+    // const username=req.json()["username"];
+    const resBody=await fetch('https://leetcode.com/graphql', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Referer': 'https://leetcode.com'
+        }, 
+        body: JSON.stringify({query: query, variables: {username: "prathambansal21103105"}}),
+    })
+    const data=await resBody.json();
+    console.log(data);
+    res.json({data:data});
 })
 
 app.post("/favs",async(req,res)=>{
