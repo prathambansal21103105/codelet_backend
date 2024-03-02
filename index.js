@@ -67,6 +67,8 @@ app.post("/favs",async(req,res)=>{
     const snap=await docRef.get();
     console.log(snap.data());
     const user=snap.data();
+    console.log("user:");
+    console.log(user);
     user["favorites"]=favs;
     const delRes = await User.doc(id).delete();
     const addRes = await User.add(user);
