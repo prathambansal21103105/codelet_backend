@@ -14,27 +14,69 @@ const query = `
       difficulty
       count
     }
+    userContestRanking(username: $username) {
+        attendedContestsCount
+        rating
+        globalRanking
+        totalParticipants
+        topPercentage
+        badge {
+          name
+        }
+      }
     matchedUser(username: $username) {
-      contributions {
-        points
-      }
-      profile {
-        reputation
-        ranking
-      }
-      submissionCalendar
-      submitStats {
-        acSubmissionNum {
-          difficulty
-          count
-          submissions
+        contestBadge {
+            name
+            expired
+            hoverText
+            icon
         }
-        totalSubmissionNum {
-          difficulty
-          count
-          submissions
+        username
+        githubUrl
+        twitterUrl
+        linkedinUrl
+        profile {
+            ranking
+            userAvatar
+            realName
+            aboutMe
+            school
+            websites
+            countryName
+            company
+            jobTitle
+            skillTags
+            postViewCount
+            postViewCountDiff
+            reputation
+            reputationDiff
+            solutionCount
+            solutionCountDiff
+            categoryDiscussCount
+            categoryDiscussCountDiff
         }
-      }
+        badges {
+            id
+            name
+            shortName
+            displayName
+            icon
+            hoverText
+            medal {
+                slug
+                config {
+                iconGif
+                iconGifBackground
+                }
+            }
+            creationDate
+            category
+        }
+        upcomingBadges {
+            name
+            icon
+            progress
+        }
     }
     recentSubmissionList(username: $username) {
       title
@@ -113,14 +155,15 @@ app.post("/create",async(req,res)=>{
     // res.send({msg:"User added"});
 })
 app.post("/fetchUserProfile",async(req,res)=>{
-    // const username=req.json()["username"];
+    const reqBody=req.body;
+    const username=reqBody["username"];
     const resBody=await fetch('https://leetcode.com/graphql', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Referer': 'https://leetcode.com'
         }, 
-        body: JSON.stringify({query: query, variables: {username: "prathambansal21103105"}}),
+        body: JSON.stringify({query: query, variables: {username: username}}),
     })
     const data=await resBody.json();
     console.log(data);
